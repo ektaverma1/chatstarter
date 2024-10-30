@@ -1,3 +1,5 @@
+import { ConvexClientProvider } from "./convex-client-provider";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -5,7 +7,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body><ConvexClientProvider>{children}</ConvexClientProvider></body>
     </html>
   );
 }
