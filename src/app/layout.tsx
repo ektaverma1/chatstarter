@@ -1,3 +1,4 @@
+import { ClerkProvider } from "@clerk/nextjs";
 import { ConvexClientProvider } from "./convex-client-provider";
 
 export default function RootLayout({
@@ -7,7 +8,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body><ConvexClientProvider>{children}</ConvexClientProvider></body>
+      <body><ClerkProvider dynamic><ConvexClientProvider>{children}</ConvexClientProvider></ClerkProvider></body>
     </html>
   );
 }
