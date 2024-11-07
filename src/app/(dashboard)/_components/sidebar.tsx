@@ -25,9 +25,14 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { DropdownMenuItem } from "@radix-ui/react-dropdown-menu";
+import { NewDirectMessage } from "./new-direct-message";
+import { usePathname } from "next/navigation";
 
 export function DashboardSidebar() {
   const user = useQuery(api.functions.user.get);
+  const directMessages = useQuery(api.functions.dm.list);
+  const pathname = usePathname();
+
   return (
     <Sidebar>
       <SidebarContent>
@@ -35,7 +40,7 @@ export function DashboardSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
-                <SidebarMenuButton>
+                <SidebarMenuButton asChild isActive={pathname === "/"}>
                   <Link href="/friends">
                     <User2Icon />
                     Friends
@@ -46,10 +51,24 @@ export function DashboardSidebar() {
           </SidebarGroupContent>
           <SidebarGroup>
             <SidebarGroupLabel>Direct Messages</SidebarGroupLabel>
-            <SidebarGroupAction>
-              <PlusIcon />
-              <span className="sr-only">New Direct Message</span>
-            </SidebarGroupAction>
+            <NewDirectMessage />
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {directMessages?.map((dm) => (
+                  <SidebarMenuItem key={dm._id}>
+                    <SidebarMenuButton asChild isActive={pathname === `/dms.${dm._id}`}>
+                      <Link href={`/dms.${dm._id}`}>
+                        <Avatar className="size-6">
+                          <AvatarImage src={dm.user.image} />
+                          <AvatarFallback />
+                        </Avatar>
+                        <p className="font-medium">{dm.user.username}</p>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
           </SidebarGroup>
         </SidebarGroup>
       </SidebarContent>
