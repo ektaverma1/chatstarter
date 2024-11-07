@@ -1,5 +1,6 @@
 import { ClerkProvider } from "@clerk/nextjs";
 import { ConvexClientProvider } from "./convex-client-provider";
+import { Toaster } from "@/components/ui/sonner";
 
 export default function RootLayout({
   children,
@@ -8,7 +9,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body><ClerkProvider dynamic><ConvexClientProvider>{children}</ConvexClientProvider></ClerkProvider></body>
+      <body><ClerkProvider dynamic><ConvexClientProvider>{children}<Toaster /></ConvexClientProvider></ClerkProvider></body>
     </html>
   );
 }
