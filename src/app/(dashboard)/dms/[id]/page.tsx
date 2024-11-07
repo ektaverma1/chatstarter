@@ -16,6 +16,7 @@ import { FunctionReturnType } from "convex/server";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { isNull } from "util";
 
 export default function MessagePage({
   params,
@@ -50,9 +51,25 @@ export default function MessagePage({
           <MessageItem key={message._id} message={message} />
         ))}
       </ScrollArea>
+      <TypingIndicators directMessage={id} />
       <MessageInput directMessage={id} />
     </div>
   );
+}
+
+function TypingIndicators({
+  directMessage,
+}: { directMessage: Id<"directMessages">}) {
+  const username = useQuery(api.functions.typing.list,{directMessage});
+
+  if(!username || username.length === 0) {
+    return null;
+  }
+  return (
+    <div className="text-sm text-muted-foreground px-4 py-2">
+      {username.join(", ")} is typing...
+    </div>
+  )
 }
 
 type Message = FunctionReturnType<typeof api.functions.message.list>[number];
@@ -110,6 +127,7 @@ function MessageInput({
 }) {
   const [content, setContent] = useState("");
   const sendMessage = useMutation(api.functions.message.create);
+  const sendTypingIndicators = useMutation(api.functions.typing.upsert);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -128,7 +146,12 @@ function MessageInput({
       <Input
         placeholder="Message"
         value={content}
-        onChange={(e) => setContent(e.target.value)}
+        onChange={(e) => setContent(e.target.value)} 
+        onKeyDown={e => {
+          if(content.length > 0) { 
+            sendTypingIndicators({directMessage})
+          }
+        }}
       />
       <Button size="icon">
         <SendIcon />

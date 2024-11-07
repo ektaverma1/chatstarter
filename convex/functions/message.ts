@@ -1,6 +1,7 @@
 import { query, mutation } from "../_generated/server";
 import { v } from "convex/values";
 import { authenticatedMutation, authenticatedQuery } from "./helper";
+import { internal } from "../_generated/api";
 
 export const list = authenticatedQuery({
     args: {
@@ -35,6 +36,10 @@ export const create = authenticatedMutation({
             throw new Error("You are not amember of direct message");
         }
         await ctx.db.insert("messages", { content, directMessage, sender: ctx.user._id });
+        await ctx.scheduler.runAfter(0, internal.functions.typing.remove, {
+            directMessage,
+            user: ctx.user._id
+        })
     }
 });
 
@@ -42,12 +47,12 @@ export const remove = authenticatedMutation({
     args: {
         id: v.id("messages"),
     },
-    handler: async (ctx, { id} ) => {
+    handler: async (ctx, { id }) => {
         const message = await ctx.db.get(id);
-        if(!message) {
+        if (!message) {
             throw new Error("Meesage does not exist");
 
-        }else if(message.sender !== ctx.user._id) {
+        } else if (message.sender !== ctx.user._id) {
             throw new Error("You are not the sender of this message")
         }
         await ctx.db.delete(id);
